@@ -8,3 +8,4 @@ t/data/sample1.useq
 t/data/sample2.useq
 META.yml
 META.json
+scripts/USeqInfo.pl

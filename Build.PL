@@ -18,6 +18,7 @@ my $build = Module::Build->new(
 		'Bio::Root::Version'  => '1.0069001',
 		'Archive::Zip'        => '1.30',
 	},
+	script_files      => [ 'scripts/USeqInfo.pl' ],
 );
 
 $build->create_build_script;
