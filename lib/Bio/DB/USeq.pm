@@ -2160,12 +2160,13 @@ sub _rewrite_metadata {
 
 sub binMean {
     my $score = shift;
-    return unless $score->{validCount};
+    return 0 unless $score->{validCount};
     $score->{sumData}/$score->{validCount};
 }
 
 sub binVariance {
     my $score = shift;
+    return 0 unless $score->{validCount};
     my $var = $score->{sumSquares} - $score->{sumData}**2/$score->{validCount};
     if ($score->{validCount} > 1) {
 	$var /= $score->{validCount}-1;
