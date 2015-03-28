@@ -1,6 +1,6 @@
 package Bio::DB::USeq;
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 =head1 NAME
 
@@ -112,6 +112,11 @@ are compressed, indexed data files supporting modern bioinformatic datasets,
 including genomic points, scores, and intervals. More information about the 
 format can be found at L<http://useq.sourceforge.net/useqArchiveFormat.html>. 
 
+USeq files are typically half the size of corresponding bigBed and bigWig files, 
+due to a compact internal format and lack of internal zoom data. This adaptor, 
+however, can still return statistics across different zoom levels in the same 
+manner as big files, albeit at a cost of calculating these in realtime.
+
 =head2 Generating useq files
 
 USeq files may be generated using tools from the USeq package, available at 
@@ -179,7 +184,7 @@ may be used.
 
 =item open($file)
 
-Open a useq file archive. Useq files typically use the .useq file 
+Open a useq file archive. Useq files typically use the F<.useq> file 
 extension. Returns true if successful. 
 
 DO NOT open a subsequent useq file archive when one has already been 
@@ -194,6 +199,7 @@ collecting data.
 =item zip
 
 Return the L<Archive::Zip> object representing the useq file archive.
+Generally not recommended unless you know what you are doing.
 
 =back
 
@@ -218,7 +224,8 @@ representing metadata for the useq file.
 =item attribute($key)
 
 Return the metadata attribute value for the specified key. These 
-are recorded in the useq file F<archiveReadMe.txt> member. 
+are recorded in the useq file F<archiveReadMe.txt> member. Returns 
+undefined if the key does not exist.
 
 =item type
 
@@ -707,7 +714,7 @@ Calculate the standard deviation from a statistical summary anonymous hash.
 =head1 USEQ SLICES
 
 Genomic observations are recorded in groups, called slices, of 
-usually 1000 observations at a time. Each slice is a separate 
+usually 10000 observations at a time. Each slice is a separate 
 zip file member in the useq file archive. These methods are for 
 accessing information about each slice. In general, accessing 
 data through slices is a lower level operation. Users should 
@@ -802,12 +809,23 @@ than simple bins of mean values as with the wiggle feature type.
     graph_type    = histogram
     autoscale     = chromosome
 
+=head1 PERFORMANCE
+
 Because the Bio::DB::USeq is implemented as a Perl-only module, 
 performance is subject to the limitations of Perl execution itself and 
-the size of the data that needs to be parsed. In general, using the 
-wiggle feature type is slightly faster than the summary feature type. 
-Very large USeq files may see better performance when converted to a 
-BigWig file, particularly when viewing large intervals.
+the size of the data that needs to be parsed. In general when collecting
+score data, requesting scores is the fastest mode of operation, followed 
+by wiggle feature types, and finally summary feature types. 
+
+In comparison to UCSC bigWig files, the USeq format is typically much 
+faster when viewing intervals where the entire interval is represented by 
+one or a few internal slices. This is especially true for repeated queries 
+over the same or neighboring intervals, as the slice contents are retained 
+in memory. As the number of internal slices that must be loaded into memory 
+increases, for example querying intervals of hundreds of kilobases in size, 
+performance will begin to lag as each internal slice must be parsed into 
+memory. This is where the UCSC bigWig file format with internal zoom levels 
+of summary statistics can outperform, at the cost of file complexity and size.
 
 =cut
 
