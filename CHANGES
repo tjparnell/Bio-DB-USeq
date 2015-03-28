@@ -1,5 +1,9 @@
 Bio::DB::USeq Change Log
 
+0.23    * Include script, USeqInfo.pl, for quick information about useq files.
+        * Bug fixes to avoid division by zero errors.
+        * Documentation improvements.
+
 0.22    * Added missing POD documentation
 
 0.21    * Set requirement for Perl 5.10.0. Will not compile on lower versions.
