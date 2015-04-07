@@ -1376,7 +1376,7 @@ sub _parse_members {
 			
 		# data file
 		my ($chromo, $strand, $start, $stop, $number, $extension) = 
-			($member =~ /^([\w\-]+)([\+\-\.])(\d+)\-(\d+)\-(\d+)\.(\w+)$/i);
+			($member =~ /^([\w\-\.]+)([\+\-\.])(\d+)\-(\d+)\-(\d+)\.(\w+)$/i);
 		
 		# check extracted metadata
 		unless ($chromo and $strand and defined $start and defined $stop and 
