@@ -110,7 +110,9 @@ Bio::DB::USeq - Read USeq archive database files
 Bio::DB::USeq is a B<BioPerl> style adaptor for reading USeq files. USeq files 
 are compressed, indexed data files supporting modern bioinformatic datasets, 
 including genomic points, scores, and intervals. More information about the 
-format can be found at L<http://useq.sourceforge.net/useqArchiveFormat.html>. 
+USeq software package can be found at L<https://github.com/HuntsmanCancerInstitute/USeq>, 
+including a description of the USeq data 
+L<archive format|https://github.com/HuntsmanCancerInstitute/USeq/blob/master/Documentation/USeqDocumentation/useqArchiveFormat.html>. 
 
 USeq files are typically half the size of corresponding bigBed and bigWig files, 
 due to a compact internal format and lack of internal zoom data. This adaptor, 
@@ -120,8 +122,9 @@ manner as big files, albeit at a cost of calculating these in realtime.
 =head2 Generating useq files
 
 USeq files may be generated using tools from the USeq package, available at 
-L<http://useq.sourceforge.net>. They may be generated from native Bar files,
-text Wig files, text Bed files, and UCSC bigWig and bigBed file formats.
+L<https://github.com/HuntsmanCancerInstitute/USeq>. They may be generated from 
+native Bar files, text Wig files, text Bed files, and UCSC bigWig and bigBed file 
+formats.
 
 =head2 Compatibility
 
