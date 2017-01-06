@@ -472,6 +472,29 @@ features() method. Stranded data collection is supported.
         -end        => $end,
     );
 
+=item observations
+
+This is a low-level data accessor, similar to features() but returning 
+an array of references to the original USeq observations. Each USeq 
+observation is an anonymous array reference of 2-4 elements: start, stop, 
+score, and text, depending on the stored data type. All coordinates are in 
+0-based coordinates, unlike high level accessors. Note that while strand is 
+supported, it is not reported for each observation. If observations exist on 
+both strands, then each strand should be searched separately. Observations 
+are not guaranteed to be returned in genomic order. 
+    
+    my @observations = $useq->observations(
+        -seq_id     => $seq_id,
+        -start      => $start,
+        -end        => $end,
+    );
+    foreach my $obs (@observations) {
+        my $start = $obs->[0] + 1; # convert to 1-based coordinate
+        my $stop  = $obs->[1];
+        my $score = $obs->[2]; # may not be present
+        my $text  = $obs->[3]; # may not be present
+    }
+
 =item segment
 
 This returns a L<Bio::DB::USeq::Segment> object, which is a SeqFeatureI 
@@ -1326,7 +1349,32 @@ sub scores {
 	return wantarray ? @$scores : $scores;
 }
 
+sub observations {
+	my $self = shift;
+	
+	# arguments can be chromo, start, stop, strand
+	my ($seq_id, $start, $stop, $strand) = $self->_get_coordinates(@_);
+	return unless $self->length($seq_id); # make sure chromosome is represented
+	
+	# determine which slices to retrieve
+	my @slices = $self->_translate_coordinates_to_slices(
+		$seq_id, $start, $stop, $strand);
+	return unless @slices;
+	$self->_clear_buffer(\@slices);
+	
+	# collect the scores from each of the requested slices
+	my @observations;
+	foreach my $slice (@slices) {
+		# load and unpack the data
+		$self->_load_slice($slice);
+		
+		# find the overlapping observations
+		my $results = $self->{'buffer'}{$slice}->fetch($start - 1, $stop);
+		push @observations, @$results;
+	}
 
+	return wantarray ? @observations : \@observations;
+}
 
 
 
