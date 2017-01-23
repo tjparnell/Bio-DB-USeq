@@ -15,6 +15,9 @@ my $build = Module::Build->new(
 			repository     => 'https://github.com/tjparnell/Bio-DB-USeq'
 		}
 	},
+	configure_requires => {
+		'Module::Build'       => 0,
+	},
 	requires          => {
 		'perl'                => '5.10.0',
 		'Bio::Root::Version'  => '1.0069001',
