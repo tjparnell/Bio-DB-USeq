@@ -7,10 +7,12 @@ use Test;
 use FindBin '$Bin';
 
 BEGIN {
-	plan tests => 25,
+	plan tests => 26,
 }
 
+use lib "$Bin/../blib/lib";
 use Bio::DB::USeq qw(binMean binStdev);
+printf "Using USeq module version %s\n", Bio::DB::USeq->VERSION;
 
 my $file = "$Bin/data/sample1.useq";
 
