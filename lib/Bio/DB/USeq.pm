@@ -1,6 +1,6 @@
 package Bio::DB::USeq;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 =head1 NAME
 
@@ -576,6 +576,8 @@ or interval. These support the following methods.
 =item get_seq_stream($type)
 
 =item scores
+
+=item observations
 
 Direct methods for returning features or scores. Coordinate information 
 need not be provided. See the corresponding Bio::DB::USeq methods for 
@@ -2384,6 +2386,16 @@ sub statistical_summary {
 	my $bins = shift;
 	$bins ||= 1;
 	return $self->features("summary:$bins");
+}
+
+sub observations {
+	my $self = shift;
+	return $self->{'useq'}->observations(
+		-seq_id => $self->seq_id,
+		-start  => $self->start,
+		-end    => $self->end,
+		-strand => $self->strand,
+	);
 }
 
 
