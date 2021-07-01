@@ -1488,8 +1488,9 @@ sub _parse_members {
 			[$chromo, $start, $stop, $strand, $extension, $number];
 		
 		# store the member into a chromosome-strand-specific interval tree
+		# interval trees are stored as 0-based, half-open intervals
 		$self->{'coord2file'}{$chromo}{$strand} ||= Set::IntervalTree->new();
-		$self->{'coord2file'}{$chromo}{$strand}->insert($member, $start, $stop);
+		$self->{'coord2file'}{$chromo}{$strand}->insert($member, $start - 1, $stop);
 	}
 	
 	# check parsing
@@ -1553,14 +1554,14 @@ sub _translate_coordinates_to_slices {
 	if ($both) {
 		# need to collect from both strands
 		# plus strand first, then minus strand
-		my $results = $self->{'coord2file'}{$seq_id}{1}->fetch($start, $stop);
-		my $results2 = $self->{'coord2file'}{$seq_id}{-1}->fetch($start, $stop);
+		my $results = $self->{'coord2file'}{$seq_id}{1}->fetch($start - 1, $stop);
+		my $results2 = $self->{'coord2file'}{$seq_id}{-1}->fetch($start - 1, $stop);
 		push @slices, @$results, @$results2;
 	}
 	
 	# specific strand
 	else {
-		my $results = $self->{'coord2file'}{$seq_id}{$strand}->fetch($start, $stop);
+		my $results = $self->{'coord2file'}{$seq_id}{$strand}->fetch($start - 1, $stop);
 		push @slices, @$results;
 	}
 	
