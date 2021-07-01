@@ -1,6 +1,6 @@
 package Bio::DB::USeq;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 =head1 NAME
 
@@ -1476,6 +1476,12 @@ sub _parse_members {
 		# convert to BioPerl convention
 		$strand = $strand eq '+' ? 1 : $strand eq '.' ? 0 : $strand eq '-' ? -1 : 0;
 		$start += 1;
+		
+		# check coordinates
+		# hack to cover a bug? Can't have zero or negative coordinates
+		if ($start >= $stop) {
+			$stop += 1;
+		}
 		
 		# store the member details for each member slice
 		$self->{'file2attribute'}{$member} = 
