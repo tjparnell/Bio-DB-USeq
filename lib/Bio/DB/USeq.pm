@@ -1128,7 +1128,7 @@ sub global_stats {
 		$sum         += $stats->{sumData};
 		$sum_squares += $stats->{sumSquares};
 		$min          = $stats->{minVal} if (!defined $min or $stats->{minVal} < $min);
-		$max          = $stats->{maxVal} if (!defined $max or $stats->{maxVal} < $max);
+		$max          = $stats->{maxVal} if (!defined $max or $stats->{maxVal} > $max);
 	}
 	
 	# assemble the statistical summary hash
