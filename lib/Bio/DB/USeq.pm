@@ -1036,15 +1036,53 @@ sub chr_stats {
 	# chromosome stats must be generated
 	my @slices = $self->_translate_coordinates_to_slices(
 		$seq_id, 1, $self->length($seq_id), 0);
-	$self->_clear_buffer(\@slices);
-	my $stat = $self->_stat_summary(1, $self->length($seq_id), \@slices);
+	
+	# the normal _stat_summary() function requires loading entire chromosome worth of 
+	# slices into memory and can become a huge memory hog, so we'll go one at time 
+	# instead in a slightly more efficient manner
+	my $count = 0;
+	my $sum;
+	my $sum_squares;
+	my $min;
+	my $max;
+	foreach my $slice (@slices) {
+		next unless $self->slice_type($slice) =~ /f/; 
+			# no sense going through if no score present
+		
+		# load and unpack the data
+		$self->_clear_buffer([$slice]);
+		$self->_load_slice($slice);
+		
+		# find the overlapping observations
+		my $results = $self->{'buffer'}{$slice}->fetch(
+			$self->slice_start($slice) - 1, $self->slice_end($slice));
+		foreach my $r (@$results) {
+			# each observation is [start, stop, score]
+			if (defined $r->[2]) {
+				$count++;
+				$sum += $r->[2];
+				$sum_squares += ($r->[2] * $r->[2]);
+				$min = $r->[2] if (!defined $min or $r->[2] < $min);
+				$max = $r->[2] if (!defined $max or $r->[2] > $max);
+			}
+		}
+	}
+	
+	# assemble stats
+	my %stat = (
+		'validCount'    => $count,
+		'sumData'       => $sum || 0,
+		'sumSquares'    => $sum_squares || 0,
+		'minVal'        => $min || 0,
+		'maxVal'        => $max || 0,
+	);
 	
 	# then associate with the metadata
-	$self->{'metadata'}{"chromStats_$seq_id"} = join(',', map { $stat->{$_} } 
+	$self->{'metadata'}{"chromStats_$seq_id"} = join(',', map { $stat{$_} } 
 		qw(validCount sumData sumSquares minVal maxVal) );
 	$self->_rewrite_metadata unless $delay_write;
 	
-	return $stat;
+	return \%stat;
 }
 
 sub chr_mean {
